@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: foundry_user
+      POSTGRES_PASSWORD: foundry_password
+      POSTGRES_DB: minifoundry
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
