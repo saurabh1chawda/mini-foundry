@@ -19,8 +19,10 @@ redis_client = None
 @app.on_event("startup")
 async def startup_event():
     global redis_client
-    # Connect to the Redis instance defined in docker-compose
-    redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    # Read host and port dynamically from environment variables
+    redis_host = os.getenv("REDIS_HOST", "localhost")
+    redis_port = int(os.getenv("REDIS_PORT", 6379))
+    redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
 
 class ChatCompletionRequest(BaseModel):
     model: str
