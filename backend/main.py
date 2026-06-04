@@ -12,6 +12,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(title="Mini-Foundry API Gateway")
+@app.get("/")
+async def read_root():
+    return {
+        "status": "healthy",
+        "message": "Welcome to Mini-Foundry Enterprise AI Gateway",
+        "docs": "/docs"
+    }
 
 # Mock Redis setup for the Token Bucket Rate Limiter
 redis_client = None
