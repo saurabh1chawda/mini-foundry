@@ -2,7 +2,8 @@ import os
 import uuid
 import time
 from fastapi import FastAPI, Request, HTTPException, Depends
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import litellm
@@ -11,14 +12,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.join(BASE_DIR, "static")
+assets_dir = os.path.join(static_dir, "assets")
+
+# Ensure static and assets directories exist
+os.makedirs(assets_dir, exist_ok=True)
+
 app = FastAPI(title="Mini-Foundry API Gateway")
+
+# Mount static files under /assets
+app.mount("/assets", StaticFiles(directory=assets_dir), name="static")
+
 @app.get("/")
 async def read_root():
     return {
         "status": "healthy",
         "message": "Welcome to Mini-Foundry Enterprise AI Gateway",
-        "docs": "/docs"
+        "docs": "/docs",
+        "dashboard": "/dashboard"
     }
+
+@app.get("/dashboard")
+async def read_dashboard():
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return JSONResponse(
+        status_code=404,
+        content={"detail": "Dashboard frontend build files not found. Make sure to build frontend first."}
+    )
 
 # Mock Redis setup for the Token Bucket Rate Limiter
 redis_client = None
