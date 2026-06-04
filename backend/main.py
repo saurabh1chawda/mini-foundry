@@ -26,11 +26,13 @@ app.mount("/assets", StaticFiles(directory=assets_dir), name="static")
 
 @app.get("/")
 async def read_root():
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
     return {
         "status": "healthy",
-        "message": "Welcome to Mini-Foundry Enterprise AI Gateway",
-        "docs": "/docs",
-        "dashboard": "/dashboard"
+        "message": "Welcome to Mini-Foundry Enterprise AI Gateway (Dashboard files missing)",
+        "docs": "/docs"
     }
 
 @app.get("/dashboard")
